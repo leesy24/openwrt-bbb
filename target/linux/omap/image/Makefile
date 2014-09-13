@@ -10,6 +10,9 @@ include $(INCLUDE_DIR)/image.mk
 UBIFS_OPTS = -F -m 2048 -e 124KiB -c 4096 -U
 UBI_OPTS = -m 2048 -p 128KiB -s 512 -O 2048
 
+FAT32_BLOCK_SIZE=1024
+FAT32_BLOCKS=$(shell echo $$(($(CONFIG_BBB_BOOT_PARTSIZE)*1024*1024/$(FAT32_BLOCK_SIZE))))
+
 define Image/BuildKernel
 	$(CP) $(KDIR)/zImage $(BIN_DIR)/openwrt-$(BOARD)-zImage
  ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
@@ -32,8 +35,22 @@ define Image/BuildKernel
 	-$(CP) $(DTS_DIR)/omap4*.dtb $(BIN_DIR)/dtbs/
 endef
 
+define Image/Build/BBB
+	rm -f $(KDIR)/boot.img
+
+	mkdosfs $(KDIR)/boot.img -C $(FAT32_BLOCKS)
+	mcopy -i $(KDIR)/boot.img $(BIN_DIR)/uboot-$(BOARD)-am335x_evm/MLO ::
+	mcopy -i $(KDIR)/boot.img $(BIN_DIR)/uboot-$(BOARD)-am335x_evm/u-boot.img ::
+	../../brcm2708/image/gen_rpi_sdcard_img.sh $(BIN_DIR)/$(IMG_PREFIX)-combined-vfat-$(1).img $(KDIR)/boot.img $(KDIR)/root.$(1) \
+		$(CONFIG_BBB_BOOT_PARTSIZE) $(CONFIG_TARGET_ROOTFS_PARTSIZE)
+endef
+
 define Image/Build
 	$(call Image/Build/$(1),$(1))
+
+ ifneq ($(CONFIG_BBB_IMAGES),)
+	$(call Image/Build/BBB,$(1))
+ endif
 endef
 
 define Image/Build/jffs2-64k
