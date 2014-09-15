@@ -1,0 +1,12 @@
+config BBB_IMAGES
+	bool "Build SD card images"
+	depends on TARGET_omap
+	default TARGET_omap
+	select TARGET_ROOTFS_INCLUDE_KERNEL
+	select TARGET_ROOTFS_INCLUDE_DTB
+
+config BBB_BOOT_PARTSIZE
+	int "Boot filesystem partition size (in MB)"
+	depends on BBB_IMAGES
+	default 8
+
