@@ -13,7 +13,7 @@ PKG_VERSION:=2.4.6
 PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=ftp://ftp.samba.org/pub/ppp/
+PKG_SOURCE_URL:=https://download.samba.org/pub/ppp/
 PKG_MD5SUM:=3434d2cc9327167a0723aaaa8670083b
 PKG_MAINTAINER:=Felix Fietkau <nbd@openwrt.org>
 
